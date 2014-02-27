@@ -10,12 +10,12 @@ use Data::Dumper;
 
 plan tests => 1 + 9 + 3 + 6 + 10 + 2;
 
-use Tree::Annotation;
+use Tree::AnnotationTree;
 
 my $annotation_tree = Tree::AnnotationTree->new();
 
 # 1 test
-isa_ok( $annotation_tree, 'Tree::Annotation' );
+isa_ok( $annotation_tree, 'Tree::AnnotationTree' );
 
 # check methods - 9 tests
 my @methods = qw( genomic_tree add_intervals_to_genomic_tree_from_hash

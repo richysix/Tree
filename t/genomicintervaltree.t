@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# annotationtree.t
+# genomicintervaltree.t
 
 use strict; use warnings;
 
@@ -12,12 +12,12 @@ use Data::Dumper;
 
 plan tests => 1 + 5 + 3 + 6 + 10 + 2 + 1 + 5;
 
-use Tree::GenomicInterval;
+use Tree::GenomicIntervalTree;
 
-my $genomic_tree = Tree::GenomicInterval->new();
+my $genomic_tree = Tree::GenomicIntervalTree->new();
 
 # 1 test
-isa_ok( $genomic_tree, 'Tree::GenomicInterval' );
+isa_ok( $genomic_tree, 'Tree::GenomicIntervalTree' );
 
 # check methods - 5 tests
 my @methods = qw( genomic_tree add_intervals_to_genomic_tree_from_hash
