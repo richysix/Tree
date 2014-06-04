@@ -2,7 +2,7 @@
 package Tree;
 ## use critic
 
-# ABSTRACT: Abstract
+# ABSTRACT: Tree - Used for constructing Tree-based data structures
 
 use warnings;
 use strict;

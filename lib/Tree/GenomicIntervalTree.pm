@@ -1,4 +1,9 @@
+## no critic (RequireUseStrict, RequireUseWarnings, RequireTidyCode)
 package Tree::GenomicIntervalTree;
+## use critic
+
+# ABSTRACT: GenomicIntervalTree object - used for holding and efficiently retrieving genomic intervals.
+
 use namespace::autoclean;
 use Moose;
 use Carp qw(cluck confess);
@@ -191,7 +196,9 @@ __END__
   
   
 =head1 DESCRIPTION
- 
 
+    Tree::GenomicIntervalTree is an implementation of an interval tree for genomic intervals.
+    Basically, it contains a separate interval tree for each chromosome/scaffold.
+    Intervals used in this implementation are closed. i.e. The interval 10-20 contains both the endpoints (10 and 20). [10,20]
 
 =cut
