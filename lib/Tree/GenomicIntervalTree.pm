@@ -6,12 +6,34 @@ use Readonly;
 
 use Set::IntervalTree;
 
+=method genomic_tree
+
+  Usage       : $genomic_interval_tree->genomic_tree;
+  Purpose     : Getter for genomic_tree attribute
+  Returns     : HashRef
+  Parameters  : None
+  Throws      : If input is given
+  Comments    : The keys of the returned hashref are seq_region_names (chromosome/scaffolds)
+                The values are Set::IntervalTree objects
+
+=cut
+
 has 'genomic_tree' => (
 	is => 'ro',
     isa => 'HashRef',
     default => sub { {} },
 );
 
+=method add_intervals_to_genomic_tree_from_hash
+
+  Usage       : $genomic_interval_tree->add_intervals_to_genomic_tree_from_hash( $hashref );
+  Purpose     : add intervals to a genomic interval tree
+  Returns     : 1 on Success
+  Parameters  : Hash or HashRef
+  Throws      : If Hash(Ref) does not match expected data structure
+  Comments    : TO DO: Accepting a hash as well as a hashref
+
+=cut
 
 sub add_intervals_to_genomic_tree_from_hash {
     my ( $self, $hash ) = @_;
@@ -47,13 +69,27 @@ END_HASH_STRUCTURE
             $self->insert_interval_into_tree( $chr, $start, $end, $object, );
         }
     }
+    return 1;
 }
+
+=method fetch_overlapping_intervals
+
+  Usage       : $genomic_interval_tree->fetch_overlapping_intervals( $chr, $start, $end );
+  Purpose     : fetch intervals from the tree that match the supplied interval
+  Returns     : ArrayRef
+  Parameters  : CHR:    String
+                START:  Integer
+                END:    Integer
+  Throws      : 
+  Comments    : TO DO: Checking input is good
+
+=cut
 
 sub fetch_overlapping_intervals {
     my ( $self, $chr, $q_start, $q_end ) = @_;
     
     if( exists $self->genomic_tree->{$chr} ){
-        my $results = $self->genomic_tree->{$chr}->fetch( $q_start, $q_end );
+        my $results = $self->genomic_tree->{$chr}->fetch( $q_start, $q_end + 1 );
         return $results;
     }
     else{
@@ -61,13 +97,40 @@ sub fetch_overlapping_intervals {
     }
 }
 
+=method insert_interval_into_tree
+
+  Usage       : $genomic_interval_tree->insert_interval_into_tree( $chr, $start, $end, $object );
+  Purpose     : inserts an interval to a genomic interval tree
+  Returns     : 1 on Success
+  Parameters  : CHR:    String
+                START:  Integer
+                END:    Integer
+                OBJECT: Any
+  Throws      : 
+  Comments    : 
+
+=cut
+
 sub insert_interval_into_tree {
     my ( $self, $chr, $start, $end, $object ) = @_;
     if( !exists $self->genomic_tree->{$chr} ){
         $self->_make_new_subtree_for_chr( $chr );
     }
-    $self->genomic_tree->{$chr}->insert( $object, $start - 1, $end + 1);
+    $self->genomic_tree->{$chr}->insert( $object, $start, $end + 1);
+    
+    return 1;
 }
+
+=method _make_new_subtree_for_chr
+
+  Usage       : $genomic_interval_tree->_make_new_subtree_for_chr( $chr );
+  Purpose     : creates an new empty Set::InetrvalTree for the supplied seq_region
+  Returns     : Set::InetrvalTree object
+  Parameters  : CHR:    String
+  Throws      : 
+  Comments    : 
+
+=cut
 
 sub _make_new_subtree_for_chr {
     my ( $self, $chr ) = @_;
@@ -87,3 +150,48 @@ sub _make_new_subtree_for_chr {
 
 __PACKAGE__->meta->make_immutable;
 1;
+
+__END__
+
+=pod
+
+=head1 SYNOPSIS
+ 
+    use Tree::GenomicIntervalTree;
+    my $genomic_tree = Tree::GenomicIntervalTree->new()
+    
+    my $intervals = {
+    1 => {
+        '1-10' => 'exon1.1',
+        '11-29' => 'intron1.1',
+        '30-40' => 'exon1.2',
+        },
+    2 => {
+        '10-20' => 'exon2.1',
+        '21-25' => 'intron2.1',
+        '26-45' => 'exon2.2',
+        '21-35' => 'intron2.2',
+        '36-45' => 'exon2.3',
+        },
+    'Zv9_scaffold1345' => {
+        '10-20' => 'exon3.1',
+        '21-29' => 'intron3.1',
+        '30-50' => 'exon3.2',
+        },
+    };
+    
+    # add intervals to tree
+    $genomic_tree->add_intervals_to_genomic_tree_from_hash( $test_intervals );
+    
+    # add a single interval
+    $genomic_tree->insert_interval_into_tree( $chr, $start, $end, $object );
+    
+    # fetch overlapping intervals
+    my $results_arrayref = $genomic_tree->fetch_overlapping_intervals( '1', 8, 35 );
+  
+  
+=head1 DESCRIPTION
+ 
+
+
+=cut

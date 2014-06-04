@@ -145,19 +145,3 @@ throws_ok { $genomic_tree->add_intervals_to_genomic_tree_from_hash( { 1 => 'scal
 throws_ok { $genomic_tree->add_intervals_to_genomic_tree_from_hash( { 1 => { 'scalar' => 'scalar' }, } ) }
     qr/Supplied\sobject\sdoes\smatch\srequired\sstructure/xms, 'Chr entry not correct format to add_intervals_to_genomic_tree_from_hash';
 
-##print join("\t", '1', '1', join(',', @{$genomic_tree->fetch_overlapping_intervals( '1', 1, 1 )} ) ), "\n";
-##print join("\t", '10', '10', join(',', @{$genomic_tree->fetch_overlapping_intervals( '1', 10, 10 )} ) ), "\n";
-##print join("\t", '11', '11', join(',', @{$genomic_tree->fetch_overlapping_intervals( '1', 11, 11 )} ) ), "\n";
-##print join("\t", '12', '12', join(',', @{$genomic_tree->fetch_overlapping_intervals( '1', 12, 12 )} ) ), "\n";
-##print join("\t", '28', '28', join(',', @{$genomic_tree->fetch_overlapping_intervals( '1', 28, 28 )} ) ), "\n";
-##print join("\t", '29', '29', join(',', @{$genomic_tree->fetch_overlapping_intervals( '1', 29, 29 )} ) ), "\n";
-##print join("\t", '30', '30', join(',', @{$genomic_tree->fetch_overlapping_intervals( '1', 30, 30 )} ) ), "\n";
-##print join("\t", '10', '11', join(',', @{$genomic_tree->fetch_overlapping_intervals( '1', 10, 11 )} ) ), "\n";
-#
-##print join("\t", '1', '1', join(',', @{$genomic_tree->fetch_overlapping_intervals( '2', 1, 1 )} ) ), "\n";
-##print join("\t", '10', '10', join(',', @{$genomic_tree->fetch_overlapping_intervals( '2', 10, 10 )} ) ), "\n";
-##print join("\t", '11', '11', join(',', @{$genomic_tree->fetch_overlapping_intervals( '2', 11, 11 )} ) ), "\n";
-##print join("\t", '21', '21', join(',', @{$genomic_tree->fetch_overlapping_intervals( '2', 21, 21 )} ) ), "\n";
-##print join("\t", '25', '25', join(',', @{$genomic_tree->fetch_overlapping_intervals( '2', 25, 25 )} ) ), "\n";
-##print join("\t", '26', '26', join(',', @{$genomic_tree->fetch_overlapping_intervals( '2', 26, 26 )} ) ), "\n";
-##print join("\t", '45', '45', join(',', @{$genomic_tree->fetch_overlapping_intervals( '2', 45, 45 )} ) ), "\n";
