@@ -9,7 +9,7 @@ use Test::More;
 use List::MoreUtils qw{ any };
 use Data::Dumper;
 
-plan tests => 1 + 9 + 3 + 6 + 10 + 2;
+plan tests => 1 + 9 + 3 + 6 + 10 + 2 + 6 + 6;
 
 use Tree::AnnotationTree;
 
@@ -24,7 +24,7 @@ my @methods = qw(
   add_intervals_to_genomic_tree_from_hash
   fetch_overlapping_intervals
   insert_interval_into_tree
-  _make_new_subtree_for_chr
+  _make_new_subtree
   add_annotations_from_annotation_file
   add_annotations_from_gff
   fetch_overlapping_annotations
@@ -36,17 +36,17 @@ foreach my $method (@methods) {
 }
 
 my $test_annotation = << "END_ANNOTATION";
-1	1	10	exon1.1
-1	11	29	intron1.1
-1	30	40	exon1.2
-2	10	20	exon2.1
-2	21	25	intron2.1
-2	26	45	exon2.2
-2	21	35	intron2.2
-2	36	45	exon2.3
-3	10	20	exon3.1
-3	21	29	intron3.1
-3	30	50	exon3.2
+1\t1\t10\texon1.1
+1\t11\t29\tintron1.1
+1\t30\t40\texon1.2
+2\t10\t20\texon2.1
+2\t21\t25\tintron2.1
+2\t26\t45\texon2.2
+2\t21\t35\tintron2.2
+2\t36\t45\texon2.3
+3\t10\t20\texon3.1
+3\t21\t29\tintron3.1
+3\t30\t50\texon3.2
 END_ANNOTATION
 
 my $test_annotation_file = 'test_annotation.txt';
@@ -130,7 +130,7 @@ my @test_gff = qw{ 1 lncRNAs lincRNA-1 5 15 0.9 + . . };
 
 my $test_gff_file = 'test_annotation.gff';
 open my $gff_fh, '>', $test_gff_file or die "Couldn't open test gff file!\n";
-print $gff_fh join( "\t", @test_gff, ), "\n";
+print $gff_fh join( "\t", @test_gff ), "\n";
 close $gff_fh;
 
 # build interval tree
@@ -144,4 +144,68 @@ foreach my $anno ( @{$results} ) {
     ok( ( any { $anno eq $_ } @expected_results ), 'testing results 13' );
 }
 
-unlink( $test_annotation_file, $test_gff_file, );
+# stranded
+$test_annotation = << "END_ANNOTATION";
+4\t1\t10\t1\texon1
+4\t5\t15\t-1\texon2
+4\t5\t5\t.\tgc
+END_ANNOTATION
+
+$test_annotation_file = 'test_annotation.txt';
+open $test_fh, '>', $test_annotation_file
+  or die "Couldn't open test annotation file!\n";
+print $test_fh $test_annotation;
+close $test_fh;
+
+# build interval tree
+$annotation_tree->add_annotations_from_annotation_file($test_annotation_file);
+
+# chr4 - 6 tests
+$results = $annotation_tree->fetch_overlapping_intervals( '4', 5, 5 );
+is( scalar @{$results}, 3, 'Both strands plus unstranded' );
+
+$results = $annotation_tree->fetch_overlapping_intervals( '4', 5, 5, 1 );
+is( scalar @{$results}, 2, 'Positive strand plus unstranded' );
+
+$results = $annotation_tree->fetch_overlapping_intervals( '4', 5, 5, -1 );
+is( scalar @{$results}, 2, 'Negative strand plus unstranded' );
+
+$results = $annotation_tree->fetch_overlapping_intervals( '4', 6, 6 );
+is( scalar @{$results}, 2, 'Both strands' );
+
+$results = $annotation_tree->fetch_overlapping_intervals( '4', 6, 6, 1 );
+is( scalar @{$results}, 1, 'Positive strand' );
+
+$results = $annotation_tree->fetch_overlapping_intervals( '4', 6, 6, -1 );
+is( scalar @{$results}, 1, 'Negative strand' );
+
+@test_gff = qw{ 4 lncRNAs lincRNA-1 5 15 0.9 + . . };
+
+$test_gff_file = 'test_annotation.gff';
+open $gff_fh, '>', $test_gff_file or die "Couldn't open test gff file!\n";
+print $gff_fh join( "\t", @test_gff ), "\n";
+close $gff_fh;
+
+# build interval tree
+$annotation_tree->add_annotations_from_gff($test_gff_file);
+
+# chr4 - 6 tests
+$results = $annotation_tree->fetch_overlapping_intervals( '4', 5, 5 );
+is( scalar @{$results}, 4, 'Both strands plus unstranded and lincRNA-1' );
+
+$results = $annotation_tree->fetch_overlapping_intervals( '4', 5, 5, 1 );
+is( scalar @{$results}, 3, 'Positive strand plus unstranded and lincRNA-1' );
+
+$results = $annotation_tree->fetch_overlapping_intervals( '4', 5, 5, -1 );
+is( scalar @{$results}, 2, 'Negative strand plus unstranded' );
+
+$results = $annotation_tree->fetch_overlapping_intervals( '4', 6, 6 );
+is( scalar @{$results}, 3, 'Both strands and lincRNA-1' );
+
+$results = $annotation_tree->fetch_overlapping_intervals( '4', 6, 6, 1 );
+is( scalar @{$results}, 2, 'Positive strand and lincRNA-1' );
+
+$results = $annotation_tree->fetch_overlapping_intervals( '4', 6, 6, -1 );
+is( scalar @{$results}, 1, 'Negative strand' );
+
+unlink( $test_annotation_file, $test_gff_file );

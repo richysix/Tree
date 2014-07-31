@@ -17,7 +17,7 @@ extends 'Tree::GenomicIntervalTree';
   Returns     : Tree::AnnotationTree object
   Parameters  : 
   Throws      : If parameters are not the correct type
-  Comments    : TO DO: Add support for strandedness
+  Comments    : 
 
 =cut
 
@@ -29,7 +29,9 @@ extends 'Tree::GenomicIntervalTree';
   Parameters  : annotation_file String
   Throws      : If file cannot be opened
   Comments    : File must be tab-separated and of the form:
-                CHR  START   END ANNOTATION
+                CHR  START  END  ANNOTATION
+                or:
+                CHR  START  END  STRAND  ANNOTATION
 
 =cut
 
@@ -37,12 +39,23 @@ sub add_annotations_from_annotation_file {
     my ( $self, $annotation_file ) = @_;
 
     # open annotation file - should be tab-separated and of the form:
-    # chr    start    end   annotation
-    open my $anno_fh, '<', $annotation_file;
-    while (<$anno_fh>) {
-        chomp;
-        my ( $chr, $start, $end, $annotation, ) = split /\t/xms, $_;
-        $self->insert_annotation_into_genomic_tree( $chr, $start, $end,
+    # chr  start  end  annotation
+    # or:
+    # chr  start  end  strand  annotation
+    open my $anno_fh, '<', $annotation_file;    ## no critic (RequireBriefOpen)
+    while ( my $line = <$anno_fh> ) {
+        chomp $line;
+        my ( $chr, $start, $end, $strand, $annotation ) = split /\t/xms, $line;
+
+        # Support both formats
+        if ( !defined $annotation ) {
+            $annotation = $strand;
+            $strand     = 0;
+        }
+
+        $strand = $self->_normalise_strand($strand);
+
+        $self->insert_annotation_into_genomic_tree( $chr, $start, $end, $strand,
             $annotation );
     }
     close $anno_fh;
@@ -65,13 +78,14 @@ sub add_annotations_from_gff {
     my ( $self, $annotation_file ) = @_;
 
     # open annotation file - should be gff format:
-    # chr   source annotation  start    end   score    strand  frame   attribute
+    # chr  source  annotation  start  end  score  strand  frame  attribute
     open my $anno_fh, '<', $annotation_file;
-    while (<$anno_fh>) {
-        chomp;
-        my ( $chr, undef, $annotation, $start, $end, undef, ) = split /\t/xms,
-          $_;
-        $self->insert_annotation_into_genomic_tree( $chr, $start, $end,
+    while ( my $line = <$anno_fh> ) {
+        chomp $line;
+        my ( $chr, undef, $annotation, $start, $end, undef, $strand ) =
+          split /\t/xms, $line;
+        $strand = $self->_normalise_strand($strand);
+        $self->insert_annotation_into_genomic_tree( $chr, $start, $end, $strand,
             $annotation );
     }
     close $anno_fh;
@@ -87,14 +101,16 @@ sub add_annotations_from_gff {
   Parameters  : CHR:    String
                 START:  Integer
                 END:    Integer
+                STRAND: Integer
   Throws      : 
   Comments    : 
 
 =cut
 
 sub fetch_overlapping_annotations {
-    my ( $self, $chr, $q_start, $q_end ) = @_;
-    return $self->fetch_overlapping_intervals( $chr, $q_start, $q_end );
+    my ( $self, $chr, $q_start, $q_end, $q_strand ) = @_;
+    return $self->fetch_overlapping_intervals( $chr, $q_start, $q_end,
+        $q_strand );
 }
 
 =method insert_annotation_into_genomic_tree
@@ -106,18 +122,31 @@ sub fetch_overlapping_annotations {
   Parameters  : CHR:    String
                 START:  Integer
                 END:    Integer
+                STRAND: Integer
                 OBJECT: Any
   Throws      : 
   Comments    : 
 
 =cut
 
-sub insert_annotation_into_genomic_tree {
-    my ( $self, $chr, $start, $end, $annotation ) = @_;
-    if ( !exists $self->genomic_tree->{$chr} ) {
-        $self->_make_new_subtree_for_chr($chr);
+sub insert_annotation_into_genomic_tree {    ## no critic (ProhibitManyArgs)
+    my ( $self, $chr, $start, $end, $strand, $annotation ) = @_;
+
+    # Support old interface (i.e. no strand parameter)
+    if ( !defined $annotation ) {
+        $annotation = $strand;
+        $strand     = 0;
     }
-    $self->insert_interval_into_tree( $chr, $start, $end, $annotation, );
+
+    $strand = $self->_normalise_strand($strand);
+
+    if ( !exists $self->genomic_tree->{$chr}->{$strand} ) {
+        $self->_make_new_subtree( $chr, $strand );
+    }
+
+    $self->insert_interval_into_tree( $chr, $start, $end, $strand,
+        $annotation );
+
     return;
 }
 
@@ -139,11 +168,11 @@ __END__
 
     # add a single interval
     $annotation_tree->insert_annotation_into_genomic_tree( $chr, $start, $end,
-        $annotation );
+        $strand, $annotation );
 
     # fetch overlapping intervals
     my $results_arrayref = $annotation_tree->fetch_overlapping_annotations( '1',
-        8, 35 );
+        8, 35, 1 );
 
 
 =head1 DESCRIPTION

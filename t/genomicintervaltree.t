@@ -11,7 +11,7 @@ use Test::Warn;
 use List::MoreUtils qw{ any };
 use Data::Dumper;
 
-plan tests => 1 + 5 + 3 + 6 + 10 + 2 + 1 + 5;
+plan tests => 1 + 5 + 3 + 6 + 10 + 2 + 1 + 5 + 6;
 
 use Tree::GenomicIntervalTree;
 
@@ -26,7 +26,7 @@ my @methods = qw(
   add_intervals_to_genomic_tree_from_hash
   fetch_overlapping_intervals
   insert_interval_into_tree
-  _make_new_subtree_for_chr
+  _make_new_subtree
 );
 
 foreach my $method (@methods) {
@@ -129,15 +129,15 @@ $genomic_tree->insert_interval_into_tree( '1', 5, 15, 'lincRNA-1' );
 $genomic_tree->insert_interval_into_tree( 'Zv9_scaffold4', 1, 100,
     'promoter-1' );
 
-#check new intervals - 2 tests
+# check new intervals - 2 tests
 $results = $genomic_tree->fetch_overlapping_intervals( '1', 10, 10 );
 @expected_results = qw( exon1.1 lincRNA-1 );
 foreach my $anno ( @{$results} ) {
     ok( ( any { $anno eq $_ } @expected_results ), 'testing results 13' );
 }
 
-# check _make_new_subtree_for_chr throws correctly - 1 test
-warning_like { $genomic_tree->_make_new_subtree_for_chr('1') }
+# check _make_new_subtree throws correctly - 1 test
+warning_like { $genomic_tree->_make_new_subtree('1') }
 qr/Tree\salready\sexists!/xms, '_make_new_subtree warning correct';
 
 # check add_intervals_to_genomic_tree_from_hash throws correctly - 5 tests
@@ -162,3 +162,34 @@ throws_ok {
 }
 qr/Supplied\sobject\sdoes\snot\smatch\srequired\sstructure/xms,
   'Chr entry not correct format to add_intervals_to_genomic_tree_from_hash';
+
+# stranded
+$test_intervals = {
+    4 => {
+        '1-10:1'  => 'exon1',
+        '5-15:-1' => 'exon2',
+        '5-5'     => 'gc',
+    },
+};
+
+# build interval tree
+$genomic_tree->add_intervals_to_genomic_tree_from_hash($test_intervals);
+
+# chr4 - 6 tests
+$results = $genomic_tree->fetch_overlapping_intervals( '4', 5, 5 );
+is( scalar @{$results}, 3, 'Both strands plus unstranded' );
+
+$results = $genomic_tree->fetch_overlapping_intervals( '4', 5, 5, 1 );
+is( scalar @{$results}, 2, 'Positive strand plus unstranded' );
+
+$results = $genomic_tree->fetch_overlapping_intervals( '4', 5, 5, -1 );
+is( scalar @{$results}, 2, 'Negative strand plus unstranded' );
+
+$results = $genomic_tree->fetch_overlapping_intervals( '4', 6, 6 );
+is( scalar @{$results}, 2, 'Both strands' );
+
+$results = $genomic_tree->fetch_overlapping_intervals( '4', 6, 6, 1 );
+is( scalar @{$results}, 1, 'Positive strand' );
+
+$results = $genomic_tree->fetch_overlapping_intervals( '4', 6, 6, -1 );
+is( scalar @{$results}, 1, 'Negative strand' );
