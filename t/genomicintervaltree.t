@@ -134,14 +134,14 @@ warning_like { $genomic_tree->_make_new_subtree_for_chr( '1' ) } qr/Tree\salread
 
 # check add_intervals_to_genomic_tree_from_hash throws correctly - 5 tests
 throws_ok { $genomic_tree->add_intervals_to_genomic_tree_from_hash( 'scalar' ) }
-    qr/Supplied\sobject\sdoes\smatch\srequired\sstructure/xms, 'Scalar input to add_intervals_to_genomic_tree_from_hash';
+    qr/Supplied\sobject\sdoes\snot\smatch\srequired\sstructure/xms, 'Scalar input to add_intervals_to_genomic_tree_from_hash';
 my @array;
 throws_ok { $genomic_tree->add_intervals_to_genomic_tree_from_hash( @array ) }
-    qr/Supplied\sobject\sdoes\smatch\srequired\sstructure/xms, 'Array input to add_intervals_to_genomic_tree_from_hash';
+    qr/Supplied\sobject\sdoes\snot\smatch\srequired\sstructure/xms, 'Array input to add_intervals_to_genomic_tree_from_hash';
 throws_ok { $genomic_tree->add_intervals_to_genomic_tree_from_hash( \@array ) }
-    qr/Supplied\sobject\sdoes\smatch\srequired\sstructure/xms, 'ArrayRef input to add_intervals_to_genomic_tree_from_hash';
+    qr/Supplied\sobject\sdoes\snot\smatch\srequired\sstructure/xms, 'ArrayRef input to add_intervals_to_genomic_tree_from_hash';
 throws_ok { $genomic_tree->add_intervals_to_genomic_tree_from_hash( { 1 => 'scalar' } ) }
-    qr/Supplied\sobject\sdoes\smatch\srequired\sstructure/xms, 'Chr entry not hash input to add_intervals_to_genomic_tree_from_hash';
+    qr/Supplied\sobject\sdoes\snot\smatch\srequired\sstructure/xms, 'Chr entry not hash input to add_intervals_to_genomic_tree_from_hash';
 throws_ok { $genomic_tree->add_intervals_to_genomic_tree_from_hash( { 1 => { 'scalar' => 'scalar' }, } ) }
-    qr/Supplied\sobject\sdoes\smatch\srequired\sstructure/xms, 'Chr entry not correct format to add_intervals_to_genomic_tree_from_hash';
+    qr/Supplied\sobject\sdoes\snot\smatch\srequired\sstructure/xms, 'Chr entry not correct format to add_intervals_to_genomic_tree_from_hash';
 

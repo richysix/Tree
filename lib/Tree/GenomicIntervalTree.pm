@@ -54,15 +54,15 @@ $hash = {
 }
 END_HASH_STRUCTURE
     if( ref $hash ne 'HASH' ){
-        confess "Supplied object does match required structure!\n\n", $HASH_STRUCTURE;
+        confess "Supplied object does not match required structure!\n\n", $HASH_STRUCTURE;
     }
     foreach my $chr ( keys %{$hash} ){
         if( ref $hash->{$chr} ne 'HASH' ){
-            confess "Supplied object does match required structure!\n\n", $HASH_STRUCTURE;
+            confess "Supplied object does not match required structure!\n\n", $HASH_STRUCTURE;
         }
         foreach my $interval ( keys %{$hash->{$chr}} ){
             if( $interval !~ m/[0-9]+\-[0-9]+/ ){
-                confess "Supplied object does match required structure!\n\n", $HASH_STRUCTURE;
+                confess "Supplied object does not match required structure!\n\n", $HASH_STRUCTURE;
             }
         }
     }
