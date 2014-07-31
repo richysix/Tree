@@ -20,15 +20,15 @@ isa_ok( $annotation_tree, 'Tree::AnnotationTree' );
 
 # check methods - 9 tests
 my @methods = qw(
-    genomic_tree
-    add_intervals_to_genomic_tree_from_hash
-    fetch_overlapping_intervals
-    insert_interval_into_tree
-    _make_new_subtree_for_chr
-    add_annotations_from_annotation_file
-    add_annotations_from_gff
-    fetch_overlapping_annotations
-    insert_annotation_into_genomic_tree
+  genomic_tree
+  add_intervals_to_genomic_tree_from_hash
+  fetch_overlapping_intervals
+  insert_interval_into_tree
+  _make_new_subtree_for_chr
+  add_annotations_from_annotation_file
+  add_annotations_from_gff
+  fetch_overlapping_annotations
+  insert_annotation_into_genomic_tree
 );
 
 foreach my $method (@methods) {

@@ -22,11 +22,11 @@ isa_ok( $genomic_tree, 'Tree::GenomicIntervalTree' );
 
 # check methods - 5 tests
 my @methods = qw(
-    genomic_tree
-    add_intervals_to_genomic_tree_from_hash
-    fetch_overlapping_intervals
-    insert_interval_into_tree
-    _make_new_subtree_for_chr
+  genomic_tree
+  add_intervals_to_genomic_tree_from_hash
+  fetch_overlapping_intervals
+  insert_interval_into_tree
+  _make_new_subtree_for_chr
 );
 
 foreach my $method (@methods) {
