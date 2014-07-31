@@ -6,6 +6,7 @@ package Tree::GenomicIntervalTree;
 
 use namespace::autoclean;
 use Moose;
+use autodie;
 use Carp qw(cluck confess);
 use Readonly;
 
@@ -64,7 +65,7 @@ END_HASH_STRUCTURE
               $HASH_STRUCTURE;
         }
         foreach my $interval ( keys %{ $hash->{$chr} } ) {
-            if ( $interval !~ m/[0-9]+\-[0-9]+/ ) {
+            if ( $interval !~ m/\d+\-\d+/xms ) {
                 confess
                   "Supplied object does not match required structure!\n\n",
                   $HASH_STRUCTURE;
@@ -74,7 +75,7 @@ END_HASH_STRUCTURE
 
     foreach my $chr ( keys %{$hash} ) {
         foreach my $interval ( keys %{ $hash->{$chr} } ) {
-            my ( $start, $end ) = split /-/, $interval;
+            my ( $start, $end ) = split /-/xms, $interval;
             my $object = $hash->{$chr}->{$interval};
             $self->insert_interval_into_tree( $chr, $start, $end, $object, );
         }
