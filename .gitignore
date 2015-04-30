@@ -1,4 +1,6 @@
 .build/
 perltidy.LOG
+perlcritic.rc
+pod-stop-words.txt
 Tree-*
 *.gz
