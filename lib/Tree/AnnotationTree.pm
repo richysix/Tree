@@ -37,6 +37,7 @@ sub add_annotations_from_annotation_file {
     # open annotation file - should be tab-separated and of the form: chr    start    end   annotation
     open my $anno_fh, '<', $annotation_file or die "Couldn't open annotation file, $annotation_file:$!\n";
     while(<$anno_fh>){
+        next if m/\A \#/xms;
         chomp;
         my( $chr, $start, $end, $annotation, ) = split /\t/, $_;
         if( !exists $self->genomic_tree->{$chr} ){
@@ -65,6 +66,7 @@ sub add_annotations_from_gff {
     # open annotation file - should be gff format:  chr    source annotation  start    end   score    strand  frame   attribute
     open my $anno_fh, '<', $annotation_file or die "Couldn't open annotation file, $annotation_file:$!\n";
     while(<$anno_fh>){
+        next if m/\A \#/xms;
         chomp;
         my( $chr, undef, $annotation, $start, $end, undef, ) = split /\t/, $_;
         if( !exists $self->genomic_tree->{$chr} ){
