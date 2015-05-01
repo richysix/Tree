@@ -44,7 +44,7 @@ sub add_annotations_from_annotation_file {
     # chr  start  end  strand  annotation
     open my $anno_fh, '<', $annotation_file;    ## no critic (RequireBriefOpen)
     while ( my $line = <$anno_fh> ) {
-        next if m/\A \#/xms; # ignore comment lines
+        next if $line =~ m/\A \#/xms; # ignore comment lines
         chomp $line;
         my ( $chr, $start, $end, $strand, $annotation ) = split /\t/xms, $line;
         
@@ -82,7 +82,7 @@ sub add_annotations_from_gff {
     # chr  source  annotation  start  end  score  strand  frame  attribute
     open my $anno_fh, '<', $annotation_file;
     while ( my $line = <$anno_fh> ) {
-        next if m/\A \#/xms; # ignore comment lines
+        next if $line =~ m/\A \#/xms; # ignore comment lines
         chomp $line;
         my ( $chr, undef, $annotation, $start, $end, undef, $strand ) =
           split /\t/xms, $line;
