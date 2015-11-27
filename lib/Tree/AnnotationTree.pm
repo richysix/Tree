@@ -1,5 +1,6 @@
 ## no critic (RequireUseStrict, RequireUseWarnings, RequireTidyCode)
 package Tree::AnnotationTree;
+
 ## use critic
 
 # ABSTRACT: AnnotationTree for efficiently retrieving genomic annotation
@@ -15,9 +16,9 @@ extends 'Tree::GenomicIntervalTree';
   Usage       : my $tree = Tree::AnnotationTree->new();
   Purpose     : Constructor for creating AnnotationTree objects
   Returns     : Tree::AnnotationTree object
-  Parameters  : 
+  Parameters  :
   Throws      : If parameters are not the correct type
-  Comments    : 
+  Comments    :
 
 =cut
 
@@ -37,7 +38,7 @@ extends 'Tree::GenomicIntervalTree';
 
 sub add_annotations_from_annotation_file {
     my ( $self, $annotation_file ) = @_;
-    
+
     # open annotation file - should be tab-separated and of the form:
     # chr  start  end  annotation
     # or:
@@ -47,15 +48,15 @@ sub add_annotations_from_annotation_file {
         next if $line =~ m/\A \#/xms; # ignore comment lines
         chomp $line;
         my ( $chr, $start, $end, $strand, $annotation ) = split /\t/xms, $line;
-        
+
         # Support both formats
         if ( !defined $annotation ) {
             $annotation = $strand;
             $strand     = 0;
         }
-        
+
         $strand = $self->_normalise_strand($strand);
-        
+
         $self->insert_annotation_into_genomic_tree( $chr, $start, $end, $strand,
             $annotation );
     }
@@ -77,7 +78,7 @@ sub add_annotations_from_annotation_file {
 
 sub add_annotations_from_gff {
     my ( $self, $annotation_file ) = @_;
-    
+
     # open annotation file - should be gff format:
     # chr  source  annotation  start  end  score  strand  frame  attribute
     open my $anno_fh, '<', $annotation_file;
@@ -104,8 +105,8 @@ sub add_annotations_from_gff {
                 START:  Integer
                 END:    Integer
                 STRAND: Integer
-  Throws      : 
-  Comments    : 
+  Throws      :
+  Comments    :
 
 =cut
 
@@ -126,8 +127,8 @@ sub fetch_overlapping_annotations {
                 END:    Integer
                 STRAND: Integer
                 OBJECT: Any
-  Throws      : 
-  Comments    : 
+  Throws      :
+  Comments    :
 
 =cut
 

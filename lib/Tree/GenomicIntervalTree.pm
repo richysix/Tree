@@ -1,5 +1,6 @@
 ## no critic (RequireUseStrict, RequireUseWarnings, RequireTidyCode)
 package Tree::GenomicIntervalTree;
+
 ## use critic
 
 # ABSTRACT: GenomicIntervalTree for efficiently retrieving genomic intervals
@@ -98,7 +99,7 @@ END_HASH_STRUCTURE
                 START:  Integer
                 END:    Integer
                 STRAND: Integer
-  Throws      : 
+  Throws      :
   Comments    : TO DO: Checking input is good
 
 =cut
@@ -138,8 +139,8 @@ sub fetch_overlapping_intervals {
                 END:    Integer
                 STRAND: Integer
                 OBJECT: Any
-  Throws      : 
-  Comments    : 
+  Throws      :
+  Comments    :
 
 =cut
 
@@ -171,8 +172,8 @@ sub insert_interval_into_tree {    ## no critic (ProhibitManyArgs)
   Returns     : Set::InetrvalTree object
   Parameters  : CHR:    String
                 STRAND: Integer
-  Throws      : 
-  Comments    : 
+  Throws      :
+  Comments    :
 
 =cut
 
@@ -202,8 +203,8 @@ sub _make_new_subtree {
   Purpose     : change strands like + or - to 1 or -1
   Returns     : Integer
   Parameters  : STRAND: Integer
-  Throws      : 
-  Comments    : 
+  Throws      :
+  Comments    :
 
 =cut
 
